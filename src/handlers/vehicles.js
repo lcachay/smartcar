@@ -1,82 +1,56 @@
+const {
+  getVehicleDetails,
+  getDoorLockStatus,
+  getFuelLevel,
+  getBatteryLevel,
+  controlVehicleEngine,
+} = require("../services/vehiclesService");
+
 const getVehicleInfoById = async (req, res) => {
   try {
     const vehicleId = req.params.id;
-
-    // TODO: Call MM API /v1/getVehicleInfoService
-    // TODO: Transform response to Smartcar format
-
-    // Mock response
-    res.json({
-      vin: "1213231",
-      color: "Metallic Silver",
-      doorCount: 4,
-      driveTrain: "v8",
-    });
+    const vehicleInfo = await getVehicleDetails(vehicleId);
+    res.json(vehicleInfo);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    const status = error.status || 500;
+    const message = status === 500 ? "Internal server error" : error.message;
+    res.status(status).json({ error: message });
   }
 };
 
 const getDoorStatusById = async (req, res) => {
   try {
     const vehicleId = req.params.id;
-
-    // TODO: Call MM API /v1/getSecurityStatusService
-    // TODO: Transform response to Smartcar format
-
-    // Mock response
-    res.json([
-      {
-        location: "frontLeft",
-        locked: true,
-      },
-      {
-        location: "frontRight",
-        locked: true,
-      },
-      {
-        location: "backLeft",
-        locked: true,
-      },
-      {
-        location: "backRight",
-        locked: false,
-      },
-    ]);
+    const doorStatus = await getDoorLockStatus(vehicleId);
+    res.json(doorStatus);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    const status = error.status || 500;
+    const message = status === 500 ? "Internal server error" : error.message;
+    res.status(status).json({ error: message });
   }
 };
 
 const getFuelLevelById = async (req, res) => {
   try {
     const vehicleId = req.params.id;
-
-    // TODO: Call MM API /v1/getEnergyService
-    // TODO: Extract fuel data and transform
-
-    // Mock response
-    res.json({
-      percent: 30.2,
-    });
+    const fuelLevel = await getFuelLevel(vehicleId);
+    res.json(fuelLevel);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    const status = error.status || 500;
+    const message = status === 500 ? "Internal server error" : error.message;
+    res.status(status).json({ error: message });
   }
 };
 
 const getBatteryLevelById = async (req, res) => {
   try {
     const vehicleId = req.params.id;
-
-    // TODO: Call MM API /v1/getEnergyService
-    // TODO: Extract battery data and transform
-
-    // Mock response
-    res.json({
-      percent: 50.3,
-    });
+    const batteryLevel = await getBatteryLevel(vehicleId);
+    res.json(batteryLevel);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    const status = error.status || 500;
+    const message = status === 500 ? "Internal server error" : error.message;
+    res.status(status).json({ error: message });
   }
 };
 
@@ -85,16 +59,12 @@ const controlEngineById = async (req, res) => {
     const vehicleId = req.params.id;
     const { action } = req.body;
 
-    // TODO: Validate action is 'START' or 'STOP'
-    // TODO: Call MM API /v1/actionEngineService
-    // TODO: Transform response
-
-    // Mock response
-    res.json({
-      status: "success",
-    });
+    const result = await controlVehicleEngine(vehicleId, action);
+    res.json(result);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    const status = error.status || 500;
+    const message = status === 500 ? "Internal server error" : error.message;
+    res.status(status).json({ error: message });
   }
 };
 

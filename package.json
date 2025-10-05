@@ -13,8 +13,11 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:unit": "jest --testPathIgnorePatterns=integration",
+    "test:unit": "jest --testPathIgnorePatterns=integration --testPathIgnorePatterns=raw --testPathIgnorePatterns=service",
     "test:integration": "jest --testPathPatterns=integration",
+    "test:mm-raw": "jest --testPathPatterns=raw",
+    "test:mm-service": "jest --testPathPatterns=service",
+    "test:mm-all": "jest --testPathPatterns='raw|service'",
     "start": "node server.js",
     "dev": "node server.js"
   },

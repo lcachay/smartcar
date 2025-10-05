@@ -25,10 +25,10 @@ const makeMMAPIRequest = async (endpoint, data) => {
     console.log(`MM API Response Body: ${JSON.stringify(response.data)}`);
 
     // MM API returns its own error status inside the body
-    if (response.data.status < 200 || response.data.status >= 300) {
+    if (parseInt(response.data.status) < 200 || parseInt(response.data.status) >= 300) {
       throw Object.assign(new Error("MM API request failed"), {
         response: {
-          status: response.data.status,
+          status: parseInt(response.data.status),
           data: response.data.reason,
           headers: response.headers,
         },
@@ -52,7 +52,7 @@ const makeMMAPIRequest = async (endpoint, data) => {
         body: error.response.data,
       };
     } else {
-      console.erorr("MM API Error:", error.message);
+      console.error("MM API Error:", error.message);
     }
   }
 };

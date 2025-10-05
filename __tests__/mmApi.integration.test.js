@@ -14,7 +14,7 @@ describe("MM API Integration Tests", () => {
       console.log(`Vehicle ${vehicleId} Info Response:`, JSON.stringify(response));
 
       // Check response structure
-      expect(response.statusCode).toBe(200);
+      expect(parseInt(response.statusCode)).toBe(200);
       expect(response.body).toHaveProperty("service", "getVehicleInfo");
       expect(response.body).toHaveProperty("status", "200");
       expect(response.body).toHaveProperty("data");
@@ -38,12 +38,8 @@ describe("MM API Integration Tests", () => {
       console.log("Invalid ID Response:", JSON.stringify(response));
 
       // Check response structure
-      expect(response.statusCode).toBe(200);
-      expect(response.body).toHaveProperty("status", "404");
-      expect(response.body).not.toHaveProperty("data");
-      expect(response.body).toHaveProperty("reason");
-      expect(response.body.reason).toContain("not found");
-      console.log("Reason for failure:", response.body.reason);
+      expect(parseInt(response.statusCode)).toBe(404);
+      expect(response.body).toContain("not found");
     });
   });
 
@@ -54,7 +50,7 @@ describe("MM API Integration Tests", () => {
       console.log(`Vehicle ${vehicleId} Security Response:`, JSON.stringify(response));
 
       // Check response structure
-      expect(response.statusCode).toBe(200);
+      expect(parseInt(response.statusCode)).toBe(200);
       expect(response.body).toHaveProperty("service", "getSecurityStatus");
       expect(response.body).toHaveProperty("status", "200");
       expect(response.body).toHaveProperty("data");
@@ -82,12 +78,8 @@ describe("MM API Integration Tests", () => {
       console.log(`Vehicle ${vehicleId} Security Response:`, JSON.stringify(response));
 
       // Check response structure
-      expect(response.statusCode).toBe(200);
-      expect(response.body).toHaveProperty("status", "404");
-      expect(response.body).not.toHaveProperty("data");
-      expect(response.body).toHaveProperty("reason");
-      expect(response.body.reason).toContain("not found");
-      console.log("Reason for failure:", response.body.reason);
+      expect(parseInt(response.statusCode)).toBe(404);
+      expect(response.body).toContain("not found");
     });
   });
 
@@ -98,7 +90,7 @@ describe("MM API Integration Tests", () => {
       console.log(`Vehicle ${vehicleId} Energy Response:`, JSON.stringify(response));
 
       // Check response structure
-      expect(response.statusCode).toBe(200);
+      expect(parseInt(response.statusCode)).toBe(200);
       expect(response.body).toHaveProperty("service");
       expect(response.body).toHaveProperty("status", "200");
       expect(response.body).toHaveProperty("data");
@@ -117,12 +109,9 @@ describe("MM API Integration Tests", () => {
 
       console.log(`Vehicle ${vehicleId} ERROR Energy Response:`, JSON.stringify(response));
 
-      expect(response.statusCode).toBe(200);
-      expect(response.body).toHaveProperty("status", "404");
-      expect(response.body).not.toHaveProperty("service");
-      expect(response.body).toHaveProperty("reason");
-      expect(response.body.reason).toContain("not found");
-      console.log("Reason for failure:", response.body.reason);
+      // Check response structure
+      expect(parseInt(response.statusCode)).toBe(404);
+      expect(response.body).toContain("not found");
     });
   });
 
@@ -134,7 +123,7 @@ describe("MM API Integration Tests", () => {
       console.log(`Vehicle ${vehicleId} Start Engine Response:`, JSON.stringify(startResponse));
 
       // Check start response structure
-      expect(startResponse.statusCode).toBe(200);
+      expect(parseInt(startResponse.statusCode)).toBe(200);
       expect(startResponse.body).toHaveProperty("service", "actionEngine");
       expect(startResponse.body).toHaveProperty("status", "200");
       expect(startResponse.body).toHaveProperty("actionResult");
@@ -150,7 +139,7 @@ describe("MM API Integration Tests", () => {
       console.log(`Vehicle ${vehicleId} Stop Engine Response:`, JSON.stringify(stopResponse));
 
       // Check stop response structure
-      expect(stopResponse.statusCode).toBe(200);
+      expect(parseInt(stopResponse.statusCode)).toBe(200);
       expect(stopResponse.body).toHaveProperty("service", "actionEngine");
       expect(stopResponse.body).toHaveProperty("status", "200");
       expect(stopResponse.body).toHaveProperty("actionResult");
@@ -165,26 +154,22 @@ describe("MM API Integration Tests", () => {
       const response = await controlEngine(VALID_VEHICLE_IDS[0], "INVALID_COMMAND");
       console.log("Invalid Command Response:", JSON.stringify(response));
 
-      expect(response.statusCode).toBe(200);
-      expect(response.body).toHaveProperty("status", "400");
-      expect(response.body).toHaveProperty("reason");
-      expect(response.body.reason).toContain("Unknown command");
-      console.log("Reason for failure:", response.body.reason);
+      // Check response structure
+      expect(parseInt(response.statusCode)).toBe(400);
+      expect(response.body).toContain("Unknown command");
     });
     test.each(INVALID_VEHICLE_IDS)("should handle invalid vehicle ID for engine control %s", async (vehicleId) => {
       const startResponse = await controlEngine(vehicleId, "START_VEHICLE");
-      expect(startResponse.statusCode).toBe(200);
-      expect(startResponse.body).toHaveProperty("status", "404");
-      expect(startResponse.body).not.toHaveProperty("service");
-      expect(startResponse.body).toHaveProperty("reason");
-      expect(startResponse.body.reason).toContain("not found");
+
+      // Check response structure
+      expect(parseInt(startResponse.statusCode)).toBe(404);
+      expect(startResponse.body).toContain("not found");
 
       const stopResponse = await controlEngine(vehicleId, "STOP_VEHICLE");
-      expect(stopResponse.statusCode).toBe(200);
-      expect(stopResponse.body).toHaveProperty("status", "404");
-      expect(stopResponse.body).not.toHaveProperty("service");
-      expect(stopResponse.body).toHaveProperty("reason");
-      expect(stopResponse.body.reason).toContain("not found");
+
+      // Check response structure
+      expect(parseInt(stopResponse.statusCode)).toBe(404);
+      expect(stopResponse.body).toContain("not found");
     });
   });
 });
