@@ -4,6 +4,7 @@
  */
 const BaseVehicleProvider = require("./BaseVehicleProvider");
 const { getVehicleInfo, getSecurityStatus, getEnergyInfo, controlEngine } = require("../services/mmApi");
+const { NotFoundError, ExternalServiceError, ValidationError } = require("../utils/errors");
 const {
   mapVehicleInfo,
   mapDoorStatus,
@@ -36,18 +37,17 @@ class MMApiProvider extends BaseVehicleProvider {
    */
   async getVehicleInfo(vehicleId) {
     if (!this.supportsVehicle(vehicleId)) {
-      const error = new Error(`Vehicle ${vehicleId} not supported by ${this.name} provider`);
-      error.status = 404;
-      throw error;
+      throw new NotFoundError(`Vehicle ${vehicleId} not supported by ${this.name} provider`);
     }
 
     const mmResponse = await getVehicleInfo(vehicleId);
 
     // Handle MM API errors
     if (mmResponse.statusCode !== 200) {
-      const error = new Error(mmResponse.body || "Vehicle not found");
-      error.status = parseInt(mmResponse.statusCode);
-      throw error;
+      if (mmResponse.statusCode === 404) {
+        throw new NotFoundError(mmResponse.body || "Vehicle not found");
+      }
+      throw new ExternalServiceError(mmResponse.body || "MM API error", "MM_API");
     }
 
     return mapVehicleInfo(mmResponse);
@@ -60,18 +60,17 @@ class MMApiProvider extends BaseVehicleProvider {
    */
   async getDoorStatus(vehicleId) {
     if (!this.supportsVehicle(vehicleId)) {
-      const error = new Error(`Vehicle ${vehicleId} not supported by ${this.name} provider`);
-      error.status = 404;
-      throw error;
+      throw new NotFoundError(`Vehicle ${vehicleId} not supported by ${this.name} provider`);
     }
 
     const mmResponse = await getSecurityStatus(vehicleId);
 
     // Handle MM API errors
     if (mmResponse.statusCode !== 200) {
-      const error = new Error(mmResponse.body || "Vehicle not found");
-      error.status = parseInt(mmResponse.statusCode);
-      throw error;
+      if (mmResponse.statusCode === 404) {
+        throw new NotFoundError(mmResponse.body || "Vehicle not found");
+      }
+      throw new ExternalServiceError(mmResponse.body || "MM API error", "MM_API");
     }
 
     return mapDoorStatus(mmResponse);
@@ -84,25 +83,22 @@ class MMApiProvider extends BaseVehicleProvider {
    */
   async getFuelLevel(vehicleId) {
     if (!this.supportsVehicle(vehicleId)) {
-      const error = new Error(`Vehicle ${vehicleId} not supported by ${this.name} provider`);
-      error.status = 404;
-      throw error;
+      throw new NotFoundError(`Vehicle ${vehicleId} not supported by ${this.name} provider`);
     }
 
     const mmResponse = await getEnergyInfo(vehicleId);
 
     // Handle MM API errors
     if (mmResponse.statusCode !== 200) {
-      const error = new Error(mmResponse.body || "Vehicle not found");
-      error.status = parseInt(mmResponse.statusCode);
-      throw error;
+      if (mmResponse.statusCode === 404) {
+        throw new NotFoundError(mmResponse.body || "Vehicle not found");
+      }
+      throw new ExternalServiceError(mmResponse.body || "MM API error", "MM_API");
     }
 
     // Check if vehicle has fuel data
     if (mmResponse.body.data.tankLevel.type === "Null" || mmResponse.body.data.tankLevel.value === "null") {
-      const error = new Error("Vehicle does not have fuel data");
-      error.status = 404;
-      throw error;
+      throw new NotFoundError("Vehicle does not have fuel data");
     }
 
     return mapFuelLevel(mmResponse);
@@ -115,25 +111,22 @@ class MMApiProvider extends BaseVehicleProvider {
    */
   async getBatteryLevel(vehicleId) {
     if (!this.supportsVehicle(vehicleId)) {
-      const error = new Error(`Vehicle ${vehicleId} not supported by ${this.name} provider`);
-      error.status = 404;
-      throw error;
+      throw new NotFoundError(`Vehicle ${vehicleId} not supported by ${this.name} provider`);
     }
 
     const mmResponse = await getEnergyInfo(vehicleId);
 
     // Handle MM API errors
     if (mmResponse.statusCode !== 200) {
-      const error = new Error(mmResponse.body || "Vehicle not found");
-      error.status = parseInt(mmResponse.statusCode);
-      throw error;
+      if (mmResponse.statusCode === 404) {
+        throw new NotFoundError(mmResponse.body || "Vehicle not found");
+      }
+      throw new ExternalServiceError(mmResponse.body || "MM API error", "MM_API");
     }
 
     // Check if vehicle has battery data
     if (mmResponse.body.data.batteryLevel.type === "Null" || mmResponse.body.data.batteryLevel.value === "null") {
-      const error = new Error("Vehicle does not have battery data");
-      error.status = 404;
-      throw error;
+      throw new NotFoundError("Vehicle does not have battery data");
     }
 
     return mapBatteryLevel(mmResponse);
@@ -147,16 +140,12 @@ class MMApiProvider extends BaseVehicleProvider {
    */
   async controlEngine(vehicleId, action) {
     if (!this.supportsVehicle(vehicleId)) {
-      const error = new Error(`Vehicle ${vehicleId} not supported by ${this.name} provider`);
-      error.status = 404;
-      throw error;
+      throw new NotFoundError(`Vehicle ${vehicleId} not supported by ${this.name} provider`);
     }
 
     // Validate action
     if (!action || !["START", "STOP"].includes(action.toUpperCase())) {
-      const error = new Error("Invalid action. Must be START or STOP");
-      error.status = 400;
-      throw error;
+      throw new ValidationError("Invalid action. Must be START or STOP");
     }
 
     // Convert to MM API format
@@ -166,9 +155,10 @@ class MMApiProvider extends BaseVehicleProvider {
 
     // Handle MM API errors
     if (mmResponse.statusCode !== 200) {
-      const error = new Error(mmResponse.body || "Engine control failed");
-      error.status = parseInt(mmResponse.statusCode);
-      throw error;
+      if (mmResponse.statusCode === 404) {
+        throw new NotFoundError(mmResponse.body || "Vehicle not found");
+      }
+      throw new ExternalServiceError(mmResponse.body || "Engine control failed", "MM_API");
     }
 
     return mapEngineAction(mmResponse);

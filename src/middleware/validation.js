@@ -31,19 +31,6 @@ const validate = (schemas) => {
 
       next();
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        const validationErrors = error.issues.map((err) => ({
-          field: err.path.join("."),
-          message: err.message,
-        }));
-
-        return res.status(400).json({
-          error: "Validation failed",
-          details: validationErrors,
-        });
-      }
-
-      // If it's not a Zod error, pass it to the error handler
       next(error);
     }
   };
@@ -79,12 +66,6 @@ const createValidateEngineAction = () => {
 // Create middleware instances
 const validateVehicleId = createValidateVehicleId();
 const validateEngineAction = createValidateEngineAction();
-
-module.exports = {
-  validate,
-  validateVehicleId,
-  validateEngineAction,
-};
 
 module.exports = {
   validate,

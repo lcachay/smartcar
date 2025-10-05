@@ -42,11 +42,14 @@ describe("Validation Middleware Tests", () => {
       const response = await apiClient.post("/vehicles/1234/engine", { action: "INVALID" });
 
       expect(response.status).toBe(400);
-      expect(response.data).toHaveProperty("error", "Validation failed");
-      expect(response.data).toHaveProperty("details");
-      expect(Array.isArray(response.data.details)).toBe(true);
+      expect(response.data).toHaveProperty("status", "error");
+      expect(response.data).toHaveProperty("error");
+      expect(response.data.error).toHaveProperty("type", "VALIDATION_ERROR");
+      expect(response.data.error).toHaveProperty("message", "Validation failed");
+      expect(response.data.error).toHaveProperty("details");
+      expect(Array.isArray(response.data.error.details)).toBe(true);
 
-      const actionError = response.data.details.find((detail) => detail.field === "action");
+      const actionError = response.data.error.details.find((detail) => detail.field === "action");
       expect(actionError).toBeDefined();
       expect(actionError.message).toContain("START");
       expect(actionError.message).toContain("STOP");
@@ -68,16 +71,20 @@ describe("Validation Middleware Tests", () => {
       const response = await apiClient.post("/vehicles/1234/engine", {});
 
       expect(response.status).toBe(400);
-      expect(response.data).toHaveProperty("error", "Validation failed");
-      expect(response.data).toHaveProperty("details");
-      expect(Array.isArray(response.data.details)).toBe(true);
+      expect(response.data).toHaveProperty("status", "error");
+      expect(response.data).toHaveProperty("error");
+      expect(response.data.error).toHaveProperty("type", "VALIDATION_ERROR");
+      expect(response.data.error).toHaveProperty("details");
+      expect(Array.isArray(response.data.error.details)).toBe(true);
     });
 
     test("should reject invalid data types", async () => {
       const response = await apiClient.post("/vehicles/1234/engine", { action: 123 });
 
       expect(response.status).toBe(400);
-      expect(response.data).toHaveProperty("error", "Validation failed");
+      expect(response.data).toHaveProperty("status", "error");
+      expect(response.data).toHaveProperty("error");
+      expect(response.data.error).toHaveProperty("type", "VALIDATION_ERROR");
     });
 
     test("should reject request with extra invalid fields", async () => {
@@ -92,16 +99,17 @@ describe("Validation Middleware Tests", () => {
 
   describe("Multiple validation errors", () => {
     test("should return all validation errors when multiple fields are invalid", async () => {
-      // Test with an endpoint that could have multiple validations
       const response = await apiClient.post("/vehicles/1234/engine", {
         action: "INVALID_ACTION",
       });
 
       expect(response.status).toBe(400);
-      expect(response.data).toHaveProperty("error", "Validation failed");
-      expect(response.data).toHaveProperty("details");
-      expect(Array.isArray(response.data.details)).toBe(true);
-      expect(response.data.details.length).toBeGreaterThan(0);
+      expect(response.data).toHaveProperty("status", "error");
+      expect(response.data).toHaveProperty("error");
+      expect(response.data.error).toHaveProperty("type", "VALIDATION_ERROR");
+      expect(response.data.error).toHaveProperty("details");
+      expect(Array.isArray(response.data.error.details)).toBe(true);
+      expect(response.data.error.details.length).toBeGreaterThan(0);
     });
   });
 

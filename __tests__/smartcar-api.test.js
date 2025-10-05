@@ -122,7 +122,7 @@ describe("Smartcar API Integration Tests", () => {
 
       expect(response.status).toBe(404);
       expect(response.data).toHaveProperty("error");
-      expect(response.data.error).toBe("Vehicle does not have battery data");
+      expect(response.data.error.message).toBe("Vehicle does not have battery data");
     });
 
     test("should return 404 for invalid vehicle ID", async () => {
@@ -206,8 +206,8 @@ describe("Smartcar API Integration Tests", () => {
 
       expect(response.status).toBe(404);
       expect(response.data).toHaveProperty("error");
-      expect(typeof response.data.error).toBe("string");
-      expect(response.data.error.length).toBeGreaterThan(0);
+      expect(typeof response.data.error.message).toBe("string");
+      expect(response.data.error.message.length).toBeGreaterThan(0);
     });
   });
 
@@ -229,15 +229,15 @@ describe("Smartcar API Integration Tests", () => {
       expect(response.data).toHaveProperty("summary");
       expect(response.data).toHaveProperty("providers");
       expect(response.data).toHaveProperty("stats");
-      
+
       expect(response.data.summary).toHaveProperty("totalProviders");
       expect(response.data.summary).toHaveProperty("healthyProviders");
       expect(response.data.summary).toHaveProperty("timestamp");
-      
+
       expect(Array.isArray(response.data.providers)).toBe(true);
       expect(response.data.providers.length).toBeGreaterThan(0);
-      
-      response.data.providers.forEach(provider => {
+
+      response.data.providers.forEach((provider) => {
         expect(provider).toHaveProperty("provider");
         expect(provider).toHaveProperty("status");
         expect(provider).toHaveProperty("timestamp");

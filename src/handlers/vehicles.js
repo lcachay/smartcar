@@ -6,55 +6,62 @@ const {
   controlVehicleEngine,
 } = require("../services/vehiclesService");
 
-const getVehicleInfoById = async (req, res) => {
+/**
+ * Get vehicle information by ID
+ */
+const getVehicleInfoById = async (req, res, next) => {
   try {
     const vehicleId = req.params.id;
     const vehicleInfo = await getVehicleDetails(vehicleId);
     res.json(vehicleInfo);
   } catch (error) {
-    const status = error.status || 500;
-    const message = status === 500 ? "Internal server error" : error.message;
-    res.status(status).json({ error: message });
+    next(error);
   }
 };
 
-const getDoorStatusById = async (req, res) => {
+/**
+ * Get door lock status by vehicle ID
+ */
+const getDoorStatusById = async (req, res, next) => {
   try {
     const vehicleId = req.params.id;
     const doorStatus = await getDoorLockStatus(vehicleId);
     res.json(doorStatus);
   } catch (error) {
-    const status = error.status || 500;
-    const message = status === 500 ? "Internal server error" : error.message;
-    res.status(status).json({ error: message });
+    next(error);
   }
 };
 
-const getFuelLevelById = async (req, res) => {
+/**
+ * Get fuel level by vehicle ID
+ */
+const getFuelLevelById = async (req, res, next) => {
   try {
     const vehicleId = req.params.id;
     const fuelLevel = await getFuelLevel(vehicleId);
     res.json(fuelLevel);
   } catch (error) {
-    const status = error.status || 500;
-    const message = status === 500 ? "Internal server error" : error.message;
-    res.status(status).json({ error: message });
+    next(error);
   }
 };
 
-const getBatteryLevelById = async (req, res) => {
+/**
+ * Get battery level by vehicle ID
+ */
+const getBatteryLevelById = async (req, res, next) => {
   try {
     const vehicleId = req.params.id;
     const batteryLevel = await getBatteryLevel(vehicleId);
     res.json(batteryLevel);
   } catch (error) {
-    const status = error.status || 500;
-    const message = status === 500 ? "Internal server error" : error.message;
-    res.status(status).json({ error: message });
+    next(error);
   }
 };
 
-const controlEngineById = async (req, res) => {
+/**
+ * Control vehicle engine (start/stop)
+ */
+const controlEngineById = async (req, res, next) => {
   try {
     const vehicleId = req.params.id;
     const { action } = req.body;
@@ -62,9 +69,7 @@ const controlEngineById = async (req, res) => {
     const result = await controlVehicleEngine(vehicleId, action);
     res.json(result);
   } catch (error) {
-    const status = error.status || 500;
-    const message = status === 500 ? "Internal server error" : error.message;
-    res.status(status).json({ error: message });
+    next(error);
   }
 };
 

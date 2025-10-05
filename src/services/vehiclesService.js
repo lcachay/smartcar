@@ -3,6 +3,7 @@
  * Orchestrates vehicle operations using pluggable providers
  */
 const providerFactory = require("../providers/ProviderFactory");
+const { NotFoundError } = require("../utils/errors");
 
 /**
  * Get vehicle details using appropriate provider
@@ -13,9 +14,7 @@ const getVehicleDetails = async (vehicleId) => {
   const provider = providerFactory.getProviderForVehicle(vehicleId);
 
   if (!provider) {
-    const error = new Error(`No provider available for vehicle ${vehicleId}`);
-    error.status = 404;
-    throw error;
+    throw new NotFoundError(`No provider available for vehicle ${vehicleId}`);
   }
 
   return await provider.getVehicleInfo(vehicleId);
@@ -30,9 +29,7 @@ const getDoorLockStatus = async (vehicleId) => {
   const provider = providerFactory.getProviderForVehicle(vehicleId);
 
   if (!provider) {
-    const error = new Error(`No provider available for vehicle ${vehicleId}`);
-    error.status = 404;
-    throw error;
+    throw new NotFoundError(`No provider available for vehicle ${vehicleId}`);
   }
 
   return await provider.getDoorStatus(vehicleId);
@@ -47,9 +44,7 @@ const getFuelLevel = async (vehicleId) => {
   const provider = providerFactory.getProviderForVehicle(vehicleId);
 
   if (!provider) {
-    const error = new Error(`No provider available for vehicle ${vehicleId}`);
-    error.status = 404;
-    throw error;
+    throw new NotFoundError(`No provider available for vehicle ${vehicleId}`);
   }
 
   return await provider.getFuelLevel(vehicleId);
@@ -64,9 +59,7 @@ const getBatteryLevel = async (vehicleId) => {
   const provider = providerFactory.getProviderForVehicle(vehicleId);
 
   if (!provider) {
-    const error = new Error(`No provider available for vehicle ${vehicleId}`);
-    error.status = 404;
-    throw error;
+    throw new NotFoundError(`No provider available for vehicle ${vehicleId}`);
   }
 
   return await provider.getBatteryLevel(vehicleId);
@@ -82,9 +75,7 @@ const controlVehicleEngine = async (vehicleId, action) => {
   const provider = providerFactory.getProviderForVehicle(vehicleId);
 
   if (!provider) {
-    const error = new Error(`No provider available for vehicle ${vehicleId}`);
-    error.status = 404;
-    throw error;
+    throw new NotFoundError(`No provider available for vehicle ${vehicleId}`);
   }
 
   return await provider.controlEngine(vehicleId, action);
