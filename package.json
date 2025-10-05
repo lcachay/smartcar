@@ -15,7 +15,12 @@
     "start": "node server.js",
     "dev": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "testMatch": [
+      "**/__tests__/**/*.test.js"
+    ]
+  }
 }

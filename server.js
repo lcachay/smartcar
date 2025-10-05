@@ -3,7 +3,9 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-// TODO: Import and use route modules
+
+const routes = require("./src/routes");
+app.use("/api", routes);
 
 // Start server
 function startServer() {
