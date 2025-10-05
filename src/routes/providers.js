@@ -1,7 +1,3 @@
-/**
- * Provider Management Routes
- * Provides endpoints for managing and monitoring providers
- */
 const express = require("express");
 const { getProvidersHealth, getProviderInfo } = require("../services/vehiclesService");
 const router = express.Router();
