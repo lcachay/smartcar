@@ -4,6 +4,7 @@
   "description": "A Node.js project for smartcar functionality.",
   "main": "server.js",
   "dependencies": {
+    "axios": "^1.12.2",
     "express": "^5.1.0"
   },
   "devDependencies": {
@@ -12,6 +13,8 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:unit": "jest --testPathIgnorePatterns=integration",
+    "test:integration": "jest --testPathPatterns=integration",
     "start": "node server.js",
     "dev": "node server.js"
   },
