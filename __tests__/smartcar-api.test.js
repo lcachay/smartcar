@@ -20,9 +20,7 @@ describe("Smartcar API Integration Tests", () => {
 
   beforeAll(async () => {
     // Start server on test port
-    server = app.listen(3001, () => {
-      console.log("Test server running on port 3001");
-    });
+    server = app.listen(3001);
     // Wait a bit for server to start
     await new Promise((resolve) => setTimeout(resolve, 100));
   });
@@ -210,6 +208,40 @@ describe("Smartcar API Integration Tests", () => {
       expect(response.data).toHaveProperty("error");
       expect(typeof response.data.error).toBe("string");
       expect(response.data.error.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe("Provider Management Endpoints", () => {
+    test("should get provider information", async () => {
+      const response = await apiClient.get("/providers/info");
+
+      expect(response.status).toBe(200);
+      expect(response.data).toHaveProperty("totalProviders");
+      expect(response.data).toHaveProperty("providers");
+      expect(typeof response.data.totalProviders).toBe("number");
+      expect(response.data.totalProviders).toBeGreaterThan(0);
+    });
+
+    test("should get provider health status", async () => {
+      const response = await apiClient.get("/providers/health");
+
+      expect([200, 503]).toContain(response.status); // 200 if healthy, 503 if any unhealthy
+      expect(response.data).toHaveProperty("summary");
+      expect(response.data).toHaveProperty("providers");
+      expect(response.data).toHaveProperty("stats");
+      
+      expect(response.data.summary).toHaveProperty("totalProviders");
+      expect(response.data.summary).toHaveProperty("healthyProviders");
+      expect(response.data.summary).toHaveProperty("timestamp");
+      
+      expect(Array.isArray(response.data.providers)).toBe(true);
+      expect(response.data.providers.length).toBeGreaterThan(0);
+      
+      response.data.providers.forEach(provider => {
+        expect(provider).toHaveProperty("provider");
+        expect(provider).toHaveProperty("status");
+        expect(provider).toHaveProperty("timestamp");
+      });
     });
   });
 });

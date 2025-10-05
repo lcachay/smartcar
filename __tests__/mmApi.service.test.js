@@ -17,8 +17,6 @@ describe("MM API Service Layer Tests", () => {
     test.each(VALID_VEHICLE_IDS)("should return successful response for valid ID %s", async (vehicleId) => {
       const response = await getVehicleInfo(vehicleId);
 
-      console.log(`Vehicle ${vehicleId} Service Response:`, JSON.stringify(response, null, 2));
-
       // Our service should return successful responses normally
       expect(response.statusCode).toBe(200);
       expect(response.body).toHaveProperty("service", "getVehicleInfo");
@@ -46,8 +44,6 @@ describe("MM API Service Layer Tests", () => {
     test.each(VALID_VEHICLE_IDS)("should return successful response for valid ID %s", async (vehicleId) => {
       const response = await getSecurityStatus(vehicleId);
 
-      console.log(`Security ${vehicleId} Service Response:`, JSON.stringify(response, null, 2));
-
       expect(response.statusCode).toBe(200);
       expect(response.body).toHaveProperty("service", "getSecurityStatus");
       expect(response.body).toHaveProperty("status", "200");
@@ -70,8 +66,6 @@ describe("MM API Service Layer Tests", () => {
     test.each(VALID_VEHICLE_IDS)("should return successful response for valid ID %s", async (vehicleId) => {
       const response = await getEnergyInfo(vehicleId);
 
-      console.log(`Energy ${vehicleId} Service Response:`, JSON.stringify(response, null, 2));
-
       expect(response.statusCode).toBe(200);
       expect(response.body).toHaveProperty("service", "getEnergy");
       expect(response.body).toHaveProperty("status", "200");
@@ -93,30 +87,18 @@ describe("MM API Service Layer Tests", () => {
 
   describe("Engine Control Service (with error transformation)", () => {
     test.each(VALID_VEHICLE_IDS)("should handle engine START for valid ID %s", async (vehicleId) => {
-      try {
-        const response = await controlEngine(vehicleId, "START_VEHICLE");
+      const response = await controlEngine(vehicleId, "START_VEHICLE");
 
-        console.log(`Engine Start ${vehicleId} Service Response:`, JSON.stringify(response, null, 2));
-
-        expect(response.statusCode).toBe(200);
-        expect(response.body).toHaveProperty("service", "actionEngine");
-        expect(response.body).toHaveProperty("status");
-      } catch (error) {
-        console.log(`Engine Start ${vehicleId} Service Error:`, error.message);
-      }
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toHaveProperty("service", "actionEngine");
+      expect(response.body).toHaveProperty("status");
     });
 
     test.each(VALID_VEHICLE_IDS)("should handle engine STOP for valid ID %s", async (vehicleId) => {
-      try {
-        const response = await controlEngine(vehicleId, "STOP_VEHICLE");
+      const response = await controlEngine(vehicleId, "STOP_VEHICLE");
 
-        console.log(`Engine Stop ${vehicleId} Service Response:`, JSON.stringify(response, null, 2));
-
-        expect(response.statusCode).toBe(200);
-        expect(response.body).toHaveProperty("service", "actionEngine");
-      } catch (error) {
-        console.log(`Engine Stop ${vehicleId} Service Error:`, error.message);
-      }
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toHaveProperty("service", "actionEngine");
     });
 
     test.each(INVALID_VEHICLE_IDS)("should throw error for invalid ID %s", async (vehicleId) => {

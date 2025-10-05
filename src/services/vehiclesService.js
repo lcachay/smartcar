@@ -1,127 +1,120 @@
-const { getVehicleInfo, getSecurityStatus, getEnergyInfo, controlEngine } = require("./mmApi");
-
-const {
-  mapVehicleInfo,
-  mapDoorStatus,
-  mapFuelLevel,
-  mapBatteryLevel,
-  mapEngineAction,
-  convertEngineAction,
-} = require("../utils/mappers");
+/**
+ * Vehicle Service Layer with Provider Abstraction
+ * Orchestrates vehicle operations using pluggable providers
+ */
+const providerFactory = require("../providers/ProviderFactory");
 
 /**
- * Get vehicle information
+ * Get vehicle details using appropriate provider
  * @param {string} vehicleId - The vehicle ID
  * @returns {Promise<Object>} - Smartcar formatted vehicle info
  */
 const getVehicleDetails = async (vehicleId) => {
-  const mmResponse = await getVehicleInfo(vehicleId);
+  const provider = providerFactory.getProviderForVehicle(vehicleId);
 
-  // Handle MM API errors
-  if (mmResponse.statusCode !== 200) {
-    const error = new Error(mmResponse.body || "Vehicle not found");
-    error.status = parseInt(mmResponse.statusCode);
+  if (!provider) {
+    const error = new Error(`No provider available for vehicle ${vehicleId}`);
+    error.status = 404;
     throw error;
   }
 
-  return mapVehicleInfo(mmResponse);
+  return await provider.getVehicleInfo(vehicleId);
 };
 
 /**
- * Get door lock status
+ * Get door lock status using appropriate provider
  * @param {string} vehicleId - The vehicle ID
  * @returns {Promise<Array>} - Smartcar formatted door status array
  */
 const getDoorLockStatus = async (vehicleId) => {
-  const mmResponse = await getSecurityStatus(vehicleId);
+  const provider = providerFactory.getProviderForVehicle(vehicleId);
 
-  // Handle MM API errors
-  if (mmResponse.statusCode !== 200) {
-    const error = new Error(mmResponse.body || "Vehicle not found");
-    error.status = parseInt(mmResponse.statusCode);
+  if (!provider) {
+    const error = new Error(`No provider available for vehicle ${vehicleId}`);
+    error.status = 404;
     throw error;
   }
 
-  return mapDoorStatus(mmResponse);
+  return await provider.getDoorStatus(vehicleId);
 };
 
 /**
- * Get fuel level
+ * Get fuel level using appropriate provider
  * @param {string} vehicleId - The vehicle ID
  * @returns {Promise<Object>} - Smartcar formatted fuel level
  */
 const getFuelLevel = async (vehicleId) => {
-  const mmResponse = await getEnergyInfo(vehicleId);
+  const provider = providerFactory.getProviderForVehicle(vehicleId);
 
-  // Handle MM API errors
-  if (mmResponse.statusCode !== 200) {
-    const error = new Error(mmResponse.body || "Vehicle not found");
-    error.status = parseInt(mmResponse.statusCode);
-    throw error;
-  }
-
-  // Check if vehicle has fuel data
-  if (mmResponse.body.data.tankLevel.type === "Null" || mmResponse.body.data.tankLevel.value === "null") {
-    const error = new Error("Vehicle does not have fuel data");
+  if (!provider) {
+    const error = new Error(`No provider available for vehicle ${vehicleId}`);
     error.status = 404;
     throw error;
   }
 
-  return mapFuelLevel(mmResponse);
+  return await provider.getFuelLevel(vehicleId);
 };
 
 /**
- * Get battery level
+ * Get battery level using appropriate provider
  * @param {string} vehicleId - The vehicle ID
  * @returns {Promise<Object>} - Smartcar formatted battery level
  */
 const getBatteryLevel = async (vehicleId) => {
-  const mmResponse = await getEnergyInfo(vehicleId);
+  const provider = providerFactory.getProviderForVehicle(vehicleId);
 
-  // Handle MM API errors
-  if (mmResponse.statusCode !== 200) {
-    const error = new Error(mmResponse.body || "Vehicle not found");
-    error.status = parseInt(mmResponse.statusCode);
-    throw error;
-  }
-
-  // Check if vehicle has battery data
-  if (mmResponse.body.data.batteryLevel.type === "Null" || mmResponse.body.data.batteryLevel.value === "null") {
-    const error = new Error("Vehicle does not have battery data");
+  if (!provider) {
+    const error = new Error(`No provider available for vehicle ${vehicleId}`);
     error.status = 404;
     throw error;
   }
 
-  return mapBatteryLevel(mmResponse);
+  return await provider.getBatteryLevel(vehicleId);
 };
 
 /**
- * Control engine (start/stop)
+ * Control vehicle engine using appropriate provider
  * @param {string} vehicleId - The vehicle ID
  * @param {string} action - 'START' or 'STOP'
  * @returns {Promise<Object>} - Smartcar formatted action result
  */
 const controlVehicleEngine = async (vehicleId, action) => {
-  // Validate action
-  if (!action || !["START", "STOP"].includes(action.toUpperCase())) {
-    const error = new Error("Invalid action. Must be START or STOP");
-    error.status = 400;
+  const provider = providerFactory.getProviderForVehicle(vehicleId);
+
+  if (!provider) {
+    const error = new Error(`No provider available for vehicle ${vehicleId}`);
+    error.status = 404;
     throw error;
   }
 
-  // Convert to MM API format
-  const mmCommand = convertEngineAction(action);
+  return await provider.controlEngine(vehicleId, action);
+};
 
-  const mmResponse = await controlEngine(vehicleId, mmCommand);
+/**
+ * Get health status of all providers
+ * @returns {Promise<Object>} - Health status summary
+ */
+const getProvidersHealth = async () => {
+  const healthChecks = await providerFactory.getProvidersHealth();
+  const stats = providerFactory.getProviderStats();
 
-  // Handle MM API errors
-  if (mmResponse.statusCode !== 200) {
-    const error = new Error(mmResponse.body || "Engine control failed");
-    error.status = parseInt(mmResponse.statusCode);
-    throw error;
-  }
+  return {
+    summary: {
+      totalProviders: stats.totalProviders,
+      healthyProviders: healthChecks.filter((h) => h.status === "healthy").length,
+      timestamp: new Date().toISOString(),
+    },
+    providers: healthChecks,
+    stats: stats,
+  };
+};
 
-  return mapEngineAction(mmResponse);
+/**
+ * Get information about available providers
+ * @returns {Object} - Provider information
+ */
+const getProviderInfo = () => {
+  return providerFactory.getProviderStats();
 };
 
 module.exports = {
@@ -130,4 +123,6 @@ module.exports = {
   getFuelLevel,
   getBatteryLevel,
   controlVehicleEngine,
+  getProvidersHealth,
+  getProviderInfo,
 };

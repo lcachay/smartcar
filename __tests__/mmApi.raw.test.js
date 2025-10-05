@@ -5,18 +5,12 @@ const MM_API_BASE_URL = "https://platform-challenge.smartcar.com";
 // Raw MM API request function (bypasses our mmApi.js service layer)
 const makeRawMMAPIRequest = async (endpoint, data) => {
   try {
-    console.log(`Making raw MM API request to: ${MM_API_BASE_URL}${endpoint}`);
-    console.log(`Request data: ${JSON.stringify(data)}`);
-
     const response = await axios.post(`${MM_API_BASE_URL}${endpoint}`, data, {
       headers: {
         "Content-Type": "application/json",
       },
       timeout: 10000,
     });
-
-    console.log(`Raw MM API Response Status: ${response.status}`);
-    console.log(`Raw MM API Response Body: ${JSON.stringify(response.data)}`);
 
     // Return raw response without any transformations
     return {
@@ -25,7 +19,6 @@ const makeRawMMAPIRequest = async (endpoint, data) => {
       body: response.data,
     };
   } catch (error) {
-    console.error("Raw MM API Error:", error.message);
     if (error.response) {
       return {
         statusCode: error.response.status,
@@ -53,8 +46,6 @@ describe("Raw MM API Integration Tests", () => {
 
       const response = await makeRawMMAPIRequest("/v1/getVehicleInfoService", requestData);
 
-      console.log(`Vehicle ${vehicleId} Raw Response:`, JSON.stringify(response, null, 2));
-
       // MM API returns HTTP 200 even for success
       expect(response.statusCode).toBe(200);
       expect(response.body).toHaveProperty("service", "getVehicleInfo");
@@ -79,8 +70,6 @@ describe("Raw MM API Integration Tests", () => {
 
         const response = await makeRawMMAPIRequest("/v1/getVehicleInfoService", requestData);
 
-        console.log(`Invalid Vehicle ${vehicleId} Raw Response:`, JSON.stringify(response, null, 2));
-
         // MM API returns HTTP 200 even for errors, but puts error status in body
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty("status", "404");
@@ -99,8 +88,6 @@ describe("Raw MM API Integration Tests", () => {
       };
 
       const response = await makeRawMMAPIRequest("/v1/getSecurityStatusService", requestData);
-
-      console.log(`Security ${vehicleId} Raw Response:`, JSON.stringify(response, null, 2));
 
       expect(response.statusCode).toBe(200);
       expect(response.body).toHaveProperty("service", "getSecurityStatus");
@@ -139,8 +126,6 @@ describe("Raw MM API Integration Tests", () => {
 
       const response = await makeRawMMAPIRequest("/v1/getEnergyService", requestData);
 
-      console.log(`Energy ${vehicleId} Raw Response:`, JSON.stringify(response, null, 2));
-
       expect(response.statusCode).toBe(200);
       expect(response.body).toHaveProperty("service", "getEnergy");
       expect(response.body).toHaveProperty("status", "200");
@@ -162,8 +147,6 @@ describe("Raw MM API Integration Tests", () => {
 
       const response = await makeRawMMAPIRequest("/v1/actionEngineService", requestData);
 
-      console.log(`Engine Start ${vehicleId} Raw Response:`, JSON.stringify(response, null, 2));
-
       expect(response.statusCode).toBe(200);
       expect(response.body).toHaveProperty("service", "actionEngine");
       // Note: Engine control might return different status codes
@@ -178,8 +161,6 @@ describe("Raw MM API Integration Tests", () => {
       };
 
       const response = await makeRawMMAPIRequest("/v1/actionEngineService", requestData);
-
-      console.log(`Engine Stop ${vehicleId} Raw Response:`, JSON.stringify(response, null, 2));
 
       expect(response.statusCode).toBe(200);
       expect(response.body).toHaveProperty("service", "actionEngine");

@@ -11,8 +11,6 @@ describe("MM API Integration Tests", () => {
     test.each(VALID_VEHICLE_IDS)("should get vehicle info for ID %s", async (vehicleId) => {
       const response = await getVehicleInfo(vehicleId);
 
-      console.log(`Vehicle ${vehicleId} Info Response:`, JSON.stringify(response));
-
       // Check response structure
       expect(parseInt(response.statusCode)).toBe(200);
       expect(response.body).toHaveProperty("service", "getVehicleInfo");
@@ -35,8 +33,6 @@ describe("MM API Integration Tests", () => {
 
     test.each(INVALID_VEHICLE_IDS)("should handle invalid vehicle ID", async (vehicleId) => {
       const response = await getVehicleInfo(vehicleId);
-      console.log("Invalid ID Response:", JSON.stringify(response));
-
       // Check response structure
       expect(parseInt(response.statusCode)).toBe(404);
       expect(response.body).toContain("not found");
@@ -46,8 +42,6 @@ describe("MM API Integration Tests", () => {
   describe("Security Status Service", () => {
     test.each(VALID_VEHICLE_IDS)("should get security status for ID %s", async (vehicleId) => {
       const response = await getSecurityStatus(vehicleId);
-
-      console.log(`Vehicle ${vehicleId} Security Response:`, JSON.stringify(response));
 
       // Check response structure
       expect(parseInt(response.statusCode)).toBe(200);
@@ -75,8 +69,6 @@ describe("MM API Integration Tests", () => {
     test.each(INVALID_VEHICLE_IDS)("should handle invalid security status for ID %s", async (vehicleId) => {
       const response = await getSecurityStatus(vehicleId);
 
-      console.log(`Vehicle ${vehicleId} Security Response:`, JSON.stringify(response));
-
       // Check response structure
       expect(parseInt(response.statusCode)).toBe(404);
       expect(response.body).toContain("not found");
@@ -86,8 +78,6 @@ describe("MM API Integration Tests", () => {
   describe("Energy Service", () => {
     test.each(VALID_VEHICLE_IDS)("should get energy info for ID %s", async (vehicleId) => {
       const response = await getEnergyInfo(vehicleId);
-
-      console.log(`Vehicle ${vehicleId} Energy Response:`, JSON.stringify(response));
 
       // Check response structure
       expect(parseInt(response.statusCode)).toBe(200);
@@ -107,8 +97,6 @@ describe("MM API Integration Tests", () => {
     test.each(INVALID_VEHICLE_IDS)("should handle invalid energy info for ID %s", async (vehicleId) => {
       const response = await getEnergyInfo(vehicleId);
 
-      console.log(`Vehicle ${vehicleId} ERROR Energy Response:`, JSON.stringify(response));
-
       // Check response structure
       expect(parseInt(response.statusCode)).toBe(404);
       expect(response.body).toContain("not found");
@@ -119,8 +107,6 @@ describe("MM API Integration Tests", () => {
     // Since I have no knowledge of why the MM API could fail to start/stop the engine I assume both EXECUTED and FAILED are acceptable responses
     test.each(VALID_VEHICLE_IDS)("should start the engine for ID %s", async (vehicleId) => {
       const startResponse = await controlEngine(vehicleId, "START_VEHICLE");
-
-      console.log(`Vehicle ${vehicleId} Start Engine Response:`, JSON.stringify(startResponse));
 
       // Check start response structure
       expect(parseInt(startResponse.statusCode)).toBe(200);
@@ -136,8 +122,6 @@ describe("MM API Integration Tests", () => {
     test.each(VALID_VEHICLE_IDS)("should stop the engine for ID %s", async (vehicleId) => {
       const stopResponse = await controlEngine(vehicleId, "STOP_VEHICLE");
 
-      console.log(`Vehicle ${vehicleId} Stop Engine Response:`, JSON.stringify(stopResponse));
-
       // Check stop response structure
       expect(parseInt(stopResponse.statusCode)).toBe(200);
       expect(stopResponse.body).toHaveProperty("service", "actionEngine");
@@ -152,8 +136,6 @@ describe("MM API Integration Tests", () => {
 
     test("should handle invalid commands", async () => {
       const response = await controlEngine(VALID_VEHICLE_IDS[0], "INVALID_COMMAND");
-      console.log("Invalid Command Response:", JSON.stringify(response));
-
       // Check response structure
       expect(parseInt(response.statusCode)).toBe(400);
       expect(response.body).toContain("Unknown command");
