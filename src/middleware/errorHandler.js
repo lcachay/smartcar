@@ -1,20 +1,24 @@
 const { z } = require("zod");
 const { AppError, ValidationError, InternalServerError } = require("../utils/errors");
+const logger = require("../../logger");
 
 /**
  * Development error response - includes stack trace and additional debugging info
  */
 const sendError = (err, res) => {
-  console.error("ERROR DETAILS:", {
-    name: err.name,
-    message: err.message,
-    statusCode: err.statusCode || 500,
-    stack: err.stack,
-    timestamp: err.timestamp || new Date().toISOString(),
-    type: err.type || "UNKNOWN_ERROR",
-    ...(err.details && { details: err.details }),
-    ...(err.service && { service: err.service }),
-  });
+  logger.error(
+    {
+      name: err.name,
+      message: err.message,
+      statusCode: err.statusCode || 500,
+      stack: err.stack,
+      timestamp: err.timestamp || new Date().toISOString(),
+      type: err.type || "UNKNOWN_ERROR",
+      ...(err.details && { details: err.details }),
+      ...(err.service && { service: err.service }),
+    },
+    "ERROR DETAILS"
+  );
 
   res.status(err.statusCode || 500).json({
     status: "error",

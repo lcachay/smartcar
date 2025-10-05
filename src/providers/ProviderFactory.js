@@ -3,6 +3,7 @@
  * Manages and creates vehicle provider instances
  * Handles provider selection and routing
  */
+const logger = require("../../logger");
 const MMApiProvider = require("./MMApiProvider");
 
 class ProviderFactory {
@@ -22,7 +23,7 @@ class ProviderFactory {
     };
     this.registerProvider("MM_API", MMApiProvider, mmApiConfig);
 
-    console.log(`Initialized ${this.providers.size} vehicle providers`);
+    logger.info(`Initialized ${this.providers.size} vehicle providers`);
   }
 
   /**
@@ -35,9 +36,9 @@ class ProviderFactory {
     try {
       const provider = new ProviderClass(config);
       this.providers.set(name, provider);
-      console.log(`Registered provider: ${name}`);
+      logger.info(`Registered provider: ${name}`);
     } catch (error) {
-      console.error(`Failed to register provider ${name}:`, error.message);
+      logger.error(error.message, `Failed to register provider ${name}:`);
     }
   }
 
@@ -66,12 +67,12 @@ class ProviderFactory {
   getProviderForVehicle(vehicleId) {
     for (const provider of this.providers.values()) {
       if (provider.supportsVehicle(vehicleId)) {
-        console.log(`Vehicle ${vehicleId} routed to provider: ${provider.name}`);
+        logger.info(`Vehicle ${vehicleId} routed to provider: ${provider.name}`);
         return provider;
       }
     }
 
-    console.warn(`No provider found for vehicle: ${vehicleId}`);
+    logger.warn(`No provider found for vehicle: ${vehicleId}`);
     return null;
   }
 

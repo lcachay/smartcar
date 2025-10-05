@@ -1,4 +1,5 @@
 const axios = require("axios");
+const logger = require("../../logger");
 
 const MM_API_BASE_URL = "https://platform-challenge.smartcar.com";
 
@@ -10,8 +11,8 @@ const MM_API_BASE_URL = "https://platform-challenge.smartcar.com";
  */
 const makeMMAPIRequest = async (endpoint, data) => {
   try {
-    console.log(`Making MM API request to: ${MM_API_BASE_URL}${endpoint}`);
-    console.log(`Request data: ${data}`);
+    logger.info(`Making MM API request to: ${MM_API_BASE_URL}${endpoint}`);
+    logger.info(`Request data: ${JSON.stringify(data)}`);
 
     const response = await axios.post(`${MM_API_BASE_URL}${endpoint}`, data, {
       headers: {
@@ -20,9 +21,9 @@ const makeMMAPIRequest = async (endpoint, data) => {
       timeout: 10000,
     });
 
-    console.log(`MM API Response Status: ${response.status}`);
-    console.log(`MM API Response Headers: ${JSON.stringify(response.headers)}`);
-    console.log(`MM API Response Body: ${JSON.stringify(response.data)}`);
+    logger.info(`MM API Response Status: ${response.status}`);
+    logger.info(`MM API Response Headers: ${JSON.stringify(response.headers)}`);
+    logger.info(`MM API Response Body: ${JSON.stringify(response.data)}`);
 
     // MM API returns its own error status inside the body
     if (parseInt(response.data.status) < 200 || parseInt(response.data.status) >= 300) {
@@ -42,9 +43,9 @@ const makeMMAPIRequest = async (endpoint, data) => {
     };
   } catch (error) {
     if (error.response) {
-      console.error(`MM API Error Response Status: ${error.response.status}`);
-      console.error(`MM API Error Response Headers: ${JSON.stringify(error.response.headers)}`);
-      console.error(`MM API Error Response Body: ${JSON.stringify(error.response.data)}`);
+      logger.error(`MM API Error Response Status: ${error.response.status}`);
+      logger.error(`MM API Error Response Headers: ${JSON.stringify(error.response.headers)}`);
+      logger.error(`MM API Error Response Body: ${JSON.stringify(error.response.data)}`);
 
       return {
         statusCode: error.response.status,
@@ -52,7 +53,7 @@ const makeMMAPIRequest = async (endpoint, data) => {
         body: error.response.data,
       };
     } else {
-      console.error("MM API Error:", error.message);
+      logger.error(`MM API Error: ${error.message}`);
     }
   }
 };

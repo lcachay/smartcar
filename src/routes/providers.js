@@ -1,5 +1,6 @@
 const express = require("express");
 const { getProvidersHealth, getProviderInfo } = require("../services/vehiclesService");
+const logger = require("../../logger");
 const router = express.Router();
 
 // GET /providers/info - Get provider information
@@ -8,7 +9,7 @@ router.get("/info", async (req, res) => {
     const providerInfo = getProviderInfo();
     res.json(providerInfo);
   } catch (error) {
-    console.error("Error getting provider info:", error);
+    logger.error(error, "Error getting provider info");
     res.status(500).json({ error: "Failed to get provider information" });
   }
 });
@@ -24,7 +25,7 @@ router.get("/health", async (req, res) => {
 
     res.status(statusCode).json(health);
   } catch (error) {
-    console.error("Error getting provider health:", error);
+    logger.error(error, "Error getting provider health");
     res.status(500).json({
       error: "Failed to get provider health",
       summary: {

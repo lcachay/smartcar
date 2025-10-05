@@ -1,8 +1,11 @@
 const express = require("express");
-const { globalErrorHandler, handleNotFound } = require("./src/middleware");
-
+const logger = require("./logger");
+const { pinoHttp } = require("pino-http");
+const { globalErrorHandler } = require("./src/middleware");
 const app = express();
 const port = process.env.PORT || 3000;
+
+app.use(pinoHttp({ logger }));
 
 app.use(express.json());
 
@@ -15,7 +18,7 @@ app.use(globalErrorHandler);
 // Start server
 function startServer() {
   return app.listen(port, () => {
-    console.log(`Smartcar API server running on port ${port}`);
+    logger.info(`Smartcar API server running on port ${port}`);
   });
 }
 
