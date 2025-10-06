@@ -4,6 +4,7 @@ const { pinoHttp } = require("pino-http");
 const { globalErrorHandler, addCorrelationId } = require("./src/middleware");
 const app = express();
 const port = process.env.PORT || 3000;
+const environment = process.env.NODE_ENV || "development";
 
 // Add correlation ID to all requests (must be first)
 app.use(addCorrelationId);
@@ -28,12 +29,25 @@ app.use(globalErrorHandler);
 
 // Start server
 function startServer() {
-  return app.listen(port, () => {
-    logger.info(
-      { port, environment: process.env.NODE_ENV || "development" },
-      `Smartcar API server running on port ${port}`
-    );
+  const server = app.listen(port, () => {
+    logger.info({ port, environment }, `Smartcar API server running on port ${port}`);
   });
+
+  // Handle server startup errors
+  server.on("error", (error) => {
+    logger.error(
+      {
+        port,
+        error: error.code,
+        message: error.message,
+        environment,
+      },
+      `Failed to start server on port ${port}: ${error.message}`
+    );
+    process.exit(1);
+  });
+
+  return server;
 }
 
 if (require.main === module) {

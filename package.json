@@ -12,7 +12,9 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
-    "jest": "^30.2.0"
+    "cross-env": "^10.1.0",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.10"
   },
   "scripts": {
     "test": "jest",
@@ -22,8 +24,9 @@
     "test:mm-raw": "jest --testPathPatterns=raw",
     "test:mm-service": "jest --testPathPatterns=service",
     "test:mm-all": "jest --testPathPatterns='raw|service'",
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "cross-env NODE_ENV=production node server.js",
+    "dev": "cross-env NODE_ENV=development nodemon server.js",
+    "dev:debug": "cross-env NODE_ENV=development DEBUG=* nodemon server.js"
   },
   "jest": {
     "testEnvironment": "node",
