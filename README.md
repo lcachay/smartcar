@@ -79,6 +79,12 @@ smartcar/
 
 The API entry point is `/api`. All routes are prefixed with this base path.
 
+### API Documentation
+
+Interactive API documentation is available via Swagger UI at:
+
+- **Development**: http://localhost:3000/swagger
+
 ### Vehicle Routes (`/api/vehicles`)
 
 - `GET /api/vehicles/:id` - Get vehicle information
@@ -203,6 +209,8 @@ Providers use standardized error types:
 - **Node.js** - JavaScript runtime environment
 - **Express.js** - Fast, unopinionated web framework for Node.js
 - **Axios** - Promise-based HTTP client for making API requests
+- **Swagger UI Express** - Interactive API documentation interface
+- **Swagger JSDoc** - Generate OpenAPI specifications from JSDoc comments
 - **Pino** - Fast JSON logger for Node.js
 - **Pino-HTTP** - HTTP request logging middleware for Express
 - **Pino-Pretty** - Pretty printing for Pino logs in development

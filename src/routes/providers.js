@@ -3,7 +3,27 @@ const { getProvidersHealth, getProviderInfo } = require("../services/vehiclesSer
 const logger = require("../../logger");
 const router = express.Router();
 
-// GET /providers/info - Get provider information
+/**
+ * @swagger
+ * /api/providers/info:
+ *   get:
+ *     summary: Get provider information
+ *     description: Retrieve information about all registered vehicle data providers
+ *     tags: [Providers]
+ *     responses:
+ *       200:
+ *         description: Provider information retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProviderInfo'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 router.get("/info", async (req, res) => {
   const { correlationId } = req;
 
@@ -23,7 +43,33 @@ router.get("/info", async (req, res) => {
   }
 });
 
-// GET /providers/health - Get health status of all providers
+/**
+ * @swagger
+ * /api/providers/health:
+ *   get:
+ *     summary: Get provider health status
+ *     description: Check the health status of all registered vehicle data providers
+ *     tags: [Providers]
+ *     responses:
+ *       200:
+ *         description: All providers are healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProviderHealth'
+ *       503:
+ *         description: One or more providers are unhealthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProviderHealth'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 router.get("/health", async (req, res) => {
   const { correlationId } = req;
 

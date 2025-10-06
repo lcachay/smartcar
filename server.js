@@ -2,6 +2,7 @@ const express = require("express");
 const logger = require("./logger");
 const { pinoHttp } = require("pino-http");
 const { globalErrorHandler, addCorrelationId } = require("./src/middleware");
+const { specs, swaggerUi } = require("./src/config/swagger");
 const app = express();
 const port = process.env.PORT || 3000;
 const environment = process.env.NODE_ENV || "development";
@@ -20,6 +21,16 @@ app.use(
 );
 
 app.use(express.json());
+
+// Swagger API Documentation
+app.use(
+  "/swagger",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, {
+    explorer: true,
+    customSiteTitle: "Smartcar API Documentation",
+  })
+);
 
 const routes = require("./src/routes");
 app.use("/api", routes);
