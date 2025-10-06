@@ -5,15 +5,20 @@ const logger = require("../../logger");
 /**
  * Development error response - includes stack trace and additional debugging info
  */
-const sendError = (err, res) => {
+const sendError = (err, req, res) => {
+  const { correlationId } = req;
+
   logger.error(
     {
+      correlationId,
       name: err.name,
       message: err.message,
       statusCode: err.statusCode || 500,
       stack: err.stack,
       timestamp: err.timestamp || new Date().toISOString(),
       type: err.type || "UNKNOWN_ERROR",
+      url: req.url,
+      method: req.method,
       ...(err.details && { details: err.details }),
       ...(err.service && { service: err.service }),
     },
@@ -64,13 +69,24 @@ const globalErrorHandler = (err, req, res, next) => {
     // If it's not one of our custom errors, wrap it
     error = new InternalServerError(err.message || "Something went wrong!");
   }
-  sendError(error, res);
+  sendError(error, req, res);
 };
 
 /**
  * Handle unhandled routes (404)
  */
 const handleNotFound = (req, res, next) => {
+  const { correlationId } = req;
+
+  logger.warn(
+    {
+      correlationId,
+      url: req.originalUrl,
+      method: req.method,
+    },
+    `Route not found: ${req.method} ${req.originalUrl}`
+  );
+
   const err = new AppError(`Can't find ${req.originalUrl} on this server!`, 404);
   err.type = "NOT_FOUND";
   next(err);

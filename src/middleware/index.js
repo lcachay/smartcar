@@ -1,5 +1,6 @@
 const { globalErrorHandler, handleNotFound } = require("./errorHandler");
 const { validate, validateVehicleId, validateEngineAction } = require("./validation");
+const { addCorrelationId } = require("./correlation");
 
 module.exports = {
   globalErrorHandler,
@@ -7,4 +8,5 @@ module.exports = {
   validate,
   validateVehicleId,
   validateEngineAction,
+  addCorrelationId,
 };

@@ -62,32 +62,76 @@ class ProviderFactory {
   /**
    * Find the appropriate provider for a vehicle ID
    * @param {string} vehicleId - The vehicle ID
+   * @param {string} correlationId - The correlation ID for tracing
    * @returns {BaseVehicleProvider|null} - Matching provider or null
    */
-  getProviderForVehicle(vehicleId) {
+  getProviderForVehicle(vehicleId, correlationId) {
     for (const provider of this.providers.values()) {
       if (provider.supportsVehicle(vehicleId)) {
-        logger.info(`Vehicle ${vehicleId} routed to provider: ${provider.name}`);
+        logger.info(
+          {
+            correlationId,
+            vehicleId,
+            provider: provider.name,
+            service: "ProviderFactory",
+          },
+          `Vehicle ${vehicleId} routed to provider: ${provider.name}`
+        );
         return provider;
       }
     }
 
-    logger.warn(`No provider found for vehicle: ${vehicleId}`);
+    logger.warn(
+      {
+        correlationId,
+        vehicleId,
+        service: "ProviderFactory",
+      },
+      `No provider found for vehicle: ${vehicleId}`
+    );
     return null;
   }
 
   /**
    * Get health status of all providers
+   * @param {string} correlationId - The correlation ID for tracing
    * @returns {Promise<Array>} - Array of provider health statuses
    */
-  async getProvidersHealth() {
+  async getProvidersHealth(correlationId) {
+    logger.info({ correlationId, service: "ProviderFactory" }, "Starting health check for all providers");
+
     const healthChecks = [];
 
     for (const provider of this.providers.values()) {
       try {
-        const health = await provider.getHealthStatus();
+        logger.info(
+          { correlationId, provider: provider.name, service: "ProviderFactory" },
+          `Checking health of provider: ${provider.name}`
+        );
+
+        const health = await provider.getHealthStatus(correlationId);
         healthChecks.push(health);
+
+        logger.info(
+          {
+            correlationId,
+            provider: provider.name,
+            status: health.status,
+            service: "ProviderFactory",
+          },
+          `Health check completed for provider: ${provider.name}`
+        );
       } catch (error) {
+        logger.error(
+          {
+            correlationId,
+            provider: provider.name,
+            error: error.message,
+            service: "ProviderFactory",
+          },
+          `Health check failed for provider: ${provider.name}`
+        );
+
         healthChecks.push({
           provider: provider.name,
           status: "error",
@@ -96,6 +140,16 @@ class ProviderFactory {
         });
       }
     }
+
+    logger.info(
+      {
+        correlationId,
+        totalProviders: healthChecks.length,
+        healthyProviders: healthChecks.filter((h) => h.status === "healthy").length,
+        service: "ProviderFactory",
+      },
+      "Completed health check for all providers"
+    );
 
     return healthChecks;
   }
